@@ -1,0 +1,38 @@
+println("hello world")
+# function to calculate the volume of a sphere
+function sphere_vol(r)
+    # julia allows Unicode names (in UTF-8 encoding)
+    # so either "pi" or the symbol π can be used
+    return 4/3*pi*r^3
+end
+
+vol = sphere_vol(3)
+
+using Plots
+
+# plot some data
+Pkg.add("Plots")
+Pkg.add("GR")
+plot([cumsum(rand(500) .- 0.5), cumsum(rand(500) .- 0.5)], bg=:black)
+# save the current figure
+savefig("plots.svg")
+# .eps, .pdf, & .png are also supported
+# we used svg here because it respects the width and height specified above
+
+Pkg.add("Tables")
+Pkg.add("MixedModels")
+using Tables, MixedModels
+
+Dyestuff = columntable((batch = string.(repeat('A':'F', inner=5)),
+       yield = [1545, 1440, 1440, 1520, 1580, 1540, 1555, 1490, 1560, 1495, 1595, 1550, 1605,
+        1510, 1560, 1445, 1440, 1595, 1465, 1545, 1595, 1630, 1515, 1635, 1625, 1520, 1455,
+        1450, 1480, 1445]));
+
+m1 = fit(MixedModel, @formula(yield ~ 1 + (1|batch)), Dyestuff)
+
+p = plot([sin, cos], zeros(0), leg=false,linecolor=:orange, bg=:black)
+anim = Animation()
+@gif for x = range(0, stop=10π, length=100)
+    push!(p, x, Float64[sin(x), cos(x)])
+    frame(anim)
+end
